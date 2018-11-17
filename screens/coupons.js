@@ -1,6 +1,7 @@
 import React from 'react';
-import { StyleSheet, ActivityIndicator, Text, View, TabNavigator, Icon, FlatList } from 'react-native';
-import {List, ListItem, SearchBar} from 'react-native-elements';
+import { StyleSheet, ActivityIndicator, Text, View, TabNavigator, Icon, FlatList, TouchableOpacity } from 'react-native';
+import {List, ListItem, SearchBar, CheckBox} from 'react-native-elements';
+import CheckItem from './CheckItem';
 
 
 // import Coupons from './screens/coupons';
@@ -12,7 +13,15 @@ class Coupons extends React.Component {
     super(props);
     this.state = {
 			allCoupons: {},
-			loading: false
+            loading: false,
+            checked: true,
+            lists:[
+            {
+                coupon: {
+                    title: "1"
+                }
+            }
+        ]
     };
   }
 
@@ -24,7 +33,11 @@ class Coupons extends React.Component {
 		this.setState({
 			loading: true
 		})
-	}
+    }
+    check(){
+        this.setState({ checked: !this.state.checked });
+        console.log("!checked:" + !this.state.checked )
+    }
 
 	onMoreDetails(item){
 		this.props.navigation.navigate('CouponDetail', {item})
@@ -84,29 +97,30 @@ class Coupons extends React.Component {
 				}}
 			/>
 		);
-	}
+    }
+    
 
   render() {
     return (
 			<List style={styles.list} containerStyle={{borderBottomWidth: 0, borderTopWidth: 0}}>
 				<FlatList
+                    checking={this.state.checked}
 					data={this.state.allCoupons}
-					keyExtractor={item => item.coupon.coupon_id}
+					// keyExtractor={item => item.coupon.coupon_id}
 					ItemSeparatorComponent={this.renderSeparator}
+					renderItem={({ item }) => (
+						<CheckItem
+							title={item.coupon.title}
+                    
+
+							// onPress={()=> this.onMoreDetails(item)}
+						/>
 					// ListHeaderComponent={this.renderHeader}
 					// ListFooterComponent={this.renderFooter}
-					renderItem={({ item }) => (
-						<ListItem
-							roundAvatar
-							title={item.coupon.title}
-							subtitle={item.coupon.details}
-							avatar={item.coupon.brand_image_url}
-							containerStyle={{borderBottomWidth: 0}}
-							onPress={()=> this.onMoreDetails(item)}
-						/>
 					)}
 				/>
 			</List>
+      
     );
   }
 };
