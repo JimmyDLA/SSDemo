@@ -1,6 +1,6 @@
 import React from 'react';
-import { StyleSheet, ActivityIndicator, Text, View, TabNavigator, Icon, FlatList, TouchableOpacity } from 'react-native';
-import {List, ListItem, SearchBar, CheckBox} from 'react-native-elements';
+import { StyleSheet, TextInput, ActivityIndicator, Text, View, TabNavigator, FlatList, TouchableOpacity } from 'react-native';
+import {List, Icon, SearchBar, CheckBox} from 'react-native-elements';
 import CheckItem from './CheckItem';
 
 
@@ -12,15 +12,13 @@ class Coupons extends React.Component {
 	constructor(props) {
     super(props);
     this.state = {
-			allCoupons: {},
-            loading: false,
-            checked: true,
-            lists:[
-            {
-                coupon: {
-                    title: "1"
-                }
-            }
+        allCoupons: {},
+        loading: false,
+        checked: true,
+        text: '',
+        inputing: false,
+        lists:[
+            
         ]
     };
   }
@@ -37,6 +35,14 @@ class Coupons extends React.Component {
     check(){
         this.setState({ checked: !this.state.checked });
         console.log("!checked:" + !this.state.checked )
+    }
+
+    createNewTodo(){
+        if(!this.state.inputing){
+            this.setState({inputing:!this.state.inputing})
+        } else {
+            this.blurInput()
+        }
     }
 
 	onMoreDetails(item){
@@ -98,29 +104,63 @@ class Coupons extends React.Component {
 			/>
 		);
     }
+
+
+    blurInput = () =>{
+        var arr=[];
+        //1.log
+        console.log("text: " + this.state.text)
+        arr.push({name: this.state.text})
+        
+
+        //2. make POST call of this.state.text
+        //temp push into an array
+        this.setState({lists: arr })
+
+        //3. remove input & clear text
+        this.setState({inputing: false})
+        this.setState({text: ''})
+    }
     
+    ifInput = () =>{
+        if (this.state.inputing) {
+            return (
+                <List style={styles.list} containerStyle={{ borderBottomWidth: 0, borderTopWidth: 0 }}>
+                    <TextInput
+                        style={{ height: 40, borderColor: 'gray', borderWidth: 3, padding: 5, margin: 10 }}
+                        onChangeText={(text) => this.setState({ text })}
+                        value={this.state.text}
+                        onBlur={this.blurInput}
+                    />
+                </List>
+            );
+        }
+    }
 
   render() {
     return (
-			<List style={styles.list} containerStyle={{borderBottomWidth: 0, borderTopWidth: 0}}>
-				<FlatList
-                    checking={this.state.checked}
-					data={this.state.allCoupons}
-					// keyExtractor={item => item.coupon.coupon_id}
-					ItemSeparatorComponent={this.renderSeparator}
-					renderItem={({ item }) => (
-						<CheckItem
-							title={item.coupon.title}
-                    
+        <List style={styles.list} containerStyle={{borderBottomWidth: 0, borderTopWidth: 0}}>
+            <FlatList
+                data={this.state.lists}
+                // keyExtractor={item => item.coupon.coupon_id}
+                ItemSeparatorComponent={this.renderSeparator}
+                renderItem={({ item }) => (
+                    <CheckItem
+                        title={item.name}
+                    />
+                )}
+            />
+            
+            {this.ifInput()}
 
-							// onPress={()=> this.onMoreDetails(item)}
-						/>
-					// ListHeaderComponent={this.renderHeader}
-					// ListFooterComponent={this.renderFooter}
-					)}
-				/>
-			</List>
-      
+            <Icon
+                name='plus'
+                type='evilicon'
+                color='#517fa4'
+                size={50}
+                onPress={()=> this.createNewTodo()}
+            />             
+        </List>
     );
   }
 };
