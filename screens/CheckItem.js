@@ -10,18 +10,10 @@ class CheckItem extends React.Component {
         super(props);
         this.state = {
             checked: false,
-            lists: [
-                {
-                    coupon: {
-                        title: "1"
-                    }
-                }
-            ]
         };
     }
     check() {
-        this.setState({ checked: !this.state.checked });
-        console.log("checkitem:" + !this.state.checked)
+        this.props.updateList(this.props.id);
     }
 
     render() {
@@ -29,10 +21,8 @@ class CheckItem extends React.Component {
             <CheckBox
                 title={this.props.title}
                 onPress={() => this.check()}
-                // containerStyle={{ borderBottomWidth: 0 }}
                 checked={this.state.checked}
                 uncheckedIcon='circle-o'
-                checkedIcon='circle'
                 checkedColor='red'
                 
             />

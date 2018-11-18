@@ -38,11 +38,7 @@ class Coupons extends React.Component {
     }
 
     createNewTodo(){
-        if(!this.state.inputing){
-            this.setState({inputing:!this.state.inputing})
-        } else {
-            this.blurInput()
-        }
+        this.blurInput()
     }
 
 	onMoreDetails(item){
@@ -107,33 +103,44 @@ class Coupons extends React.Component {
 
 
     blurInput = () =>{
-        var arr=[];
-        //1.log
-        console.log("text: " + this.state.text)
-        arr.push({name: this.state.text})
-        
-
-        //2. make POST call of this.state.text
-        //temp push into an array
-        this.setState({lists: arr })
-
-        //3. remove input & clear text
-        this.setState({inputing: false})
-        this.setState({text: ''})
-    }
+        if (this.state.text == "") {
+            return
+        } else{
+            var ID = function () {
+                return '' + Math.random().toString(36).substr(2, 9);
+            }
+            //1.log
+            console.log("text: " + this.state.text)
+            var newelement = {
+                name: this.state.text,
+                id: ID()
+            }
+            
+            //2. make POST call of this.state.text
+            //temp push into an array
+            this.setState({ lists: [...this.state.lists, newelement] });
     
-    ifInput = () =>{
-        if (this.state.inputing) {
-            return (
-                <List style={styles.list} containerStyle={{ borderBottomWidth: 0, borderTopWidth: 0 }}>
-                    <TextInput
-                        style={{ height: 40, borderColor: 'gray', borderWidth: 3, padding: 5, margin: 10 }}
-                        onChangeText={(text) => this.setState({ text })}
-                        value={this.state.text}
-                        onBlur={this.blurInput}
-                    />
-                </List>
-            );
+            //3. remove input & clear text
+            this.setState({inputing: false})
+            this.setState({text: ''})
+
+        }
+    }
+
+    updateList = (id) => {
+        //1. loop thru List and find exact match
+        for (let j = 0; j < this.state.lists.length; j++) {
+            const element = this.state.lists[j].id;
+            //2. once found, delete it!
+            if (id == element) {
+                console.log("found match! -> " + element)
+                newList = this.state.lists;
+                newList.splice(j, 1);
+                this.setState({lists: newList});
+                console.log("new list " + JSON.stringify(newList));
+                console.log("state list " + this.state.lists)
+                return
+            }
         }
     }
 
@@ -142,16 +149,23 @@ class Coupons extends React.Component {
         <List style={styles.list} containerStyle={{borderBottomWidth: 0, borderTopWidth: 0}}>
             <FlatList
                 data={this.state.lists}
-                // keyExtractor={item => item.coupon.coupon_id}
                 ItemSeparatorComponent={this.renderSeparator}
                 renderItem={({ item }) => (
                     <CheckItem
                         title={item.name}
+                        id={item.id}
+                        updateList={this.updateList}
                     />
                 )}
             />
             
-            {this.ifInput()}
+            <TextInput
+                style={{ height: 40, borderColor: 'gray', borderWidth: 3, padding: 5, margin: 10 }}
+                onChangeText={(text) => this.setState({ text })}
+                value={this.state.text}
+                onBlur={this.blurInput}
+                placeholder='Enter New Task...'
+            />
 
             <Icon
                 name='plus'
